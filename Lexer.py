@@ -1,113 +1,136 @@
+from os import error
 from typing import List
 import re
 
 class Token:
+    def __init__(self, type, value) -> None:
+        self.type = type
+        self.value = value
+
+
     def __str__(self) -> str:
-        return "undefined"
+        return "Type = {type}, Value = {value}".format(self.type, self.value)
 
-class Add(Token):
-    def __str__(self) -> str:
-        return "Add"
+# class Add(Token):
+#     def __str__(self) -> str:
+#         return "Add"
 
-class Increment(Token):
-    def __str__(self) -> str:
-        return "increment"
+# class Increment(Token):
+#     def __str__(self) -> str:
+#         return "increment"
 
-class Min(Token):
-    def __str__(self) -> str:
-        return "Minus"
+# class Min(Token):
+#     def __str__(self) -> str:
+#         return "Minus"
 
-class Decrement(Token):
-    def __str__(self) -> str:
-        return "Decrement"
+# class Decrement(Token):
+#     def __str__(self) -> str:
+#         return "Decrement"
 
-class OpenBrac(Token):
-    def __str__(self) -> str:
-        return "Open haakje"
+# class OpenBrac(Token):
+#     def __str__(self) -> str:
+#         return "Open haakje"
 
-class CloseBrac(Token):
-    def __str__(self) -> str:
-        return "Dicht haakje"
+# class CloseBrac(Token):
+#     def __str__(self) -> str:
+#         return "Dicht haakje"
 
-class OpenCurly(Token):
-     def __str__(self) -> str:
-        return "open curly haakje"
+# class OpenCurly(Token):
+#      def __str__(self) -> str:
+#         return "open curly haakje"
 
-class CloseCurly(Token):
-     def __str__(self) -> str:
-        return "dicht curly haakje"
+# class CloseCurly(Token):
+#      def __str__(self) -> str:
+#         return "dicht curly haakje"
 
-class Semi(Token):
-    def __str__(self) -> str:
-        return "Semicolon"
+# class Semi(Token):
+#     def __str__(self) -> str:
+#         return "Semicolon"
 
-class Equal(Token):
-    def __str__(self) -> str:
-        return "equal"
+# class Equal(Token):
+#     def __str__(self) -> str:
+#         return "equal"
+# class IntId(Token):
+#     def __str__(self) -> str:
+#         return "int identifier"
 
-
+CHAR, INTEGER, PLUS, MINUS, EQUAL, MUL, DIV, STARTBRACKED, ENDBRACKED, OPENCURLY, CLOSECURLY, EOF, EOL, NOTFOUND = (
+    'CHAR','INTEGER', 'PLUS', 'MINUS', 'EQUAL', 'MUL', 'DIV', '(', ')','{', '}', 'EOF', 'EOL', 'NOT FOUND'
+)
 
 def lexerReverse(code, tokenList : List[Token] = []):
     c , *rest = code
+    print(rest)
     if rest == []:
+        print("return list")
         return tokenList
+    if c == '':
+      return lexerReverse(rest, tokenList)  
    
     if c == '-':
-        tokenList.append(Add())
+        tokenList.append(Token(PLUS, '+'))
         return lexerReverse(rest, tokenList)
 
     if c == '+':
-        tokenList.append(Min())
+        tokenList.append(Token(MINUS, '-'))
         return lexerReverse(rest, tokenList)
 
     if c == ';':
 
-        tokenList.append(Semi())
+        tokenList.append(Token(EOL, ';'))
         return lexerReverse(rest, tokenList)
     
-    if c == '++':
-
-        tokenList.append(Decrement())
-        return lexerReverse(rest, tokenList)
-    
-    if c == '--':
-
-        tokenList.append(Increment())
-        return lexerReverse(rest, tokenList)
-
     if c == ')':
 
-        tokenList.append(OpenBrac())
+        tokenList.append(Token(STARTBRACKED, '('))
         return lexerReverse(rest, tokenList)
 
     if c == '(':
 
-        tokenList.append(CloseBrac())
+        tokenList.append(Token(ENDBRACKED, ')'))
         return lexerReverse(rest, tokenList)
 
     if c == '}':
 
-        tokenList.append(OpenCurly())
+        tokenList.append(Token(OPENCURLY, '{'))
         return lexerReverse(rest, tokenList)
 
     if c == '{':
 
-        tokenList.append(CloseCurly())
+        tokenList.append(Token(CLOSECURLY, '}'))
         return lexerReverse(rest, tokenList)
 
     if c == '=':
-        tokenList.append(Equal())
+        tokenList.append(Token(EQUAL, '='))
+        return lexerReverse(rest, tokenList)
+    if c == 'tni':
+        print("ben hier gekomen")
+        tokenList.append(Token(INTEGER, 'NONE'))
         return lexerReverse(rest, tokenList)
 
+    if c.isdigit():
+        tokenList.append(Token(INTEGER, c))
+        return lexerReverse(rest, tokenList)
+    
+    if isinstance(c, str):
+        tokenList.append(Token(CHAR, c))
+        return lexerReverse(rest, tokenList)
+   
+    tokenList.append(Token(NOTFOUND, ''))
+    return lexerReverse(rest, tokenList)
 
-    else:
-        return lexerReverse(rest,tokenList)
 
 
-with open('test.esrever', 'r') as file:
-    code = file.read()
-code = re.split('\n| |;', code)
-print(code)
+
+file = open('test.esrever', 'r')
+code = file.readlines()
+
+for lines in code:
+    code = re.split('\n| |;', lines)
+    print(code)
+    x = lexerReverse(code)
+    print(x)
+    print("OUT")
 
 
-print(lexerReverse(code))
+

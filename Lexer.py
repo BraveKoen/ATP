@@ -1,6 +1,7 @@
 from os import error
 from typing import List
 import re
+import ast
 
 class Token:
     def __init__(self, type, value) -> None:
@@ -9,7 +10,7 @@ class Token:
 
 
     def __str__(self) -> str:
-        return "Type = {type}, Value = {value}".format(self.type, self.value)
+        return self.type, self.value
 
 # class Add(Token):
 #     def __str__(self) -> str:
@@ -104,12 +105,11 @@ def lexerReverse(code, tokenList : List[Token] = []):
         tokenList.append(Token(EQUAL, '='))
         return lexerReverse(rest, tokenList)
     if c == 'tni':
-        print("ben hier gekomen")
         tokenList.append(Token(INTEGER, 'NONE'))
         return lexerReverse(rest, tokenList)
 
     if c.isdigit():
-        tokenList.append(Token(INTEGER, c))
+        tokenList.append(Token(INTEGER, int(c)))
         return lexerReverse(rest, tokenList)
     
     if isinstance(c, str):
@@ -131,6 +131,3 @@ for lines in code:
     x = lexerReverse(code)
     print(x)
     print("OUT")
-
-
-
